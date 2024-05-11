@@ -1,0 +1,31 @@
+{
+    "builders": [
+        {
+            "type": "docker",
+            "image": "ubuntu:jammy@sha256:2af372c1e2645779643284c7dc38775e3dbbc417b2d784a27c5a9eb784014fb8",
+            "commit": true,
+            "changes": [
+                "ENTRYPOINT /entry.sh"
+            ]
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "ansible",
+            "user": "root",
+            "playbook_file": "docker-images/service1/service1.yml",
+            "extra_arguments": [
+                "--ssh-extra-args", "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa"
+            ]
+        }
+    ],
+    "post-processors": [
+        [
+            {
+                "type": "docker-tag",
+                "repository": "851725552187.dkr.ecr.eu-central-1.amazonaws.com/vi-service1",
+                "tag": "0.0.1"
+            }
+        ]
+    ]
+}

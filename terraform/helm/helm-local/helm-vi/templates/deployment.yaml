@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vi1
+  namespace: default
+  labels:
+    app: vi1
+    version: v1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vi1
+  template:
+    metadata:
+      labels:
+        app: vi1
+        version: v1.0.0
+    spec:
+      containers:
+        - name: vi1
+          image: {{ .Values.vi_backend_image.image }}
+          imagePullPolicy: {{ .Values.vi_backend_image.pullPolicy }}
+          ports: {{- toYaml .Values.vi_backend_image.ports | nindent 12 }}
+          env: {{- toYaml .Values.vi_backend_image.env | nindent 12 }}
+          resources:
+            requests:
+              cpu: {{ .Values.vi_backend_image.cpu }}
+              memory: {{ .Values.vi_backend_image.memory }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vi2
+  namespace: default
+  labels:
+    app: vi2
+    version: v1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vi2
+  template:
+    metadata:
+      labels:
+        app: vi2
+        version: v1.0.0
+    spec:
+      containers:
+        - name: vi2
+          image: {{ .Values.vi_backend_image.image_2 }}
+          imagePullPolicy: {{ .Values.vi_backend_image.pullPolicy }}
+          ports_2: {{- toYaml .Values.vi_backend_image.ports | nindent 12 }}
+          env: {{- toYaml .Values.vi_backend_image.env | nindent 12 }}
+          resources:
+            requests:
+              cpu: {{ .Values.vi_backend_image.cpu }}
+              memory: {{ .Values.vi_backend_image.memory }}

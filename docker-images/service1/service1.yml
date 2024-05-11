@@ -1,0 +1,68 @@
+---
+- name: Provision Python
+  hosts: all
+  gather_facts: no
+  tasks:
+
+    - name: Boostrap python
+      raw: test -e /usr/bin/python3 || (apt-get -y update && apt-get install -y python3-minimal)
+      retries: 3
+      register: result
+      until: result is not failed
+
+    - name: Update apt-get repo and cache
+      apt: 
+        update_cache: yes
+
+    - name: Install apt repository required packages
+      apt: 
+        name: 
+        - ca-certificates
+        - apt-transport-https
+        - software-properties-common
+
+    - name: Add repository keys
+      apt_key:
+        url: "http://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+
+    - name: add repository
+      apt_repository:
+        repo: "{{ item }}"
+        state: present
+        update_cache: no
+      with_items:
+        - "deb http://deb.nodesource.com/node_20.x jammy main"
+        - "deb-src http://deb.nodesource.com/node_20.x jammy main"
+
+    - name: Installing dependencies 
+      apt: 
+        name: 
+          - nginx
+          - nodejs
+          - wget
+          - curl
+          - htop
+        state: latest
+        update_cache: yes
+
+    - name: Copy artifacts
+      copy:
+        src: ../../packages/service1
+        dest: /code
+        mode: u+rwx
+
+    - name: Install packages based on package.json.
+      community.general.npm:
+        path: /code/service1
+        
+    - name: Copy wrapper script
+      copy:
+        src: scripts/entry.sh
+        dest: /entry.sh
+        mode: a+x
+
+    - name: Clean packages
+      raw: apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y
+
+    - name: Remove apt lists
+      raw: rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp* /usr/share/doc/*

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: vi-chart
+description: vi-chart
+type: application
+version: 0.0.3
+#appVersion: "1.0.0"

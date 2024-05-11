@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vi-k8s
+  namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/load-balancer-name: vi-k8s
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/group.name: vi-app-groupd
+spec:
+  ingressClassName: alb
+  rules:
+  - host: vi-k8s-614831835.eu-central-1.elb.amazonaws.com
+    http:
+      paths:
+      - path: /vi1
+        pathType: Prefix
+        backend:
+          service:
+            name: vi1
+            port:
+              number: 3010
+  - host: vi-k8s-614831835.eu-central-1.elb.amazonaws.com
+    http:
+      paths:
+      - path: /vi2
+        pathType: Prefix
+        backend:
+          service:
+            name: vi2
+            port:
+              number: 3011
